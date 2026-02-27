@@ -21,6 +21,8 @@ Route::middleware('auth:sanctum','CheckRole:admin')->prefix('admin')->group(func
     Route::get('/allPlans',[plansController::class,'getAllPlans'])->name('get-All-Plans');
     Route::put('/updatePlan/{id}',[plansController::class,'updatePlan'])->name('update-plan');
     Route::delete('/deletePlan/{id}',[plansController::class,'deletePlan'])->name('delete-plan');
+    Route::put('/activatePlan/{id}',[plansController::class,'activatePLan'])->name('activate-plan');
+    Route::put('/deactivatePlan/{id}',[plansController::class,'deactivatePLan'])->name('deactivate-plan');
 });
 
 //common admin and client protected routes

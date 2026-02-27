@@ -77,4 +77,32 @@ class plansController extends Controller
             'message'=>'plan deleted successfully'
         ],200);
     }
+    public function activatePlan(Request $request,$id){
+        $plan=Plan::whereId($id)->first();
+        if(!$plan){
+            return response()->json([
+                'message'=>'plan not found'
+            ],404);
+        }
+        $plan->isActive=true;
+        $plan->save();
+
+        return response()->json([
+            'message'=>"{$plan->name} plan activated"
+        ]);
+    }
+    public function deactivatePlan(Request $request,$id){
+        $plan=Plan::whereId($id)->first();
+        if(!$plan){
+            return response()->json([
+                'message'=>'plan not found'
+            ],404);
+        }
+        $plan->isActive=false;
+        $plan->save();
+
+        return response()->json([
+            'message'=>"{$plan->name} plan deactivated"
+        ]);
+    }
 }
