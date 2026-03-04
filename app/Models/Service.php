@@ -15,4 +15,7 @@ class Service extends Model
     public function aiRequests(){
         return $this->hasMany(AiRequest::class);
     }
+    public function plans(){
+        return $this->hasMany(Plan::class);
+    }
 }

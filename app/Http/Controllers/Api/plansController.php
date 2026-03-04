@@ -11,6 +11,7 @@ class plansController extends Controller
     public function createPlan(Request $request)
     {
         $request->validate([
+            'service_id'=>"required",
             "name" => "required",
             "price" => "required|numeric|min:0|decimal:0,2",
             "request_limit" => "required|numeric",
@@ -18,6 +19,7 @@ class plansController extends Controller
         ]);
         $plan = Plan::create([
             'name' => $request->name,
+            'service_id'=>$request->service_id,
             'price' => $request->price,
             'request_limit' => $request->request_limit,
             'duration_days' => $request->duration_days

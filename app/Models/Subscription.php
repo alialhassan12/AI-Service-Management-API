@@ -13,7 +13,10 @@ class Subscription extends Model
         'ends_at',
         'status'
     ];
-    
+    protected $casts=[
+        'starts_at'=>'datetime',
+        'ends_at'=>'datetime'
+    ];
     //Relations
     public function user(){
         return $this->belongsTo(User::class);

@@ -8,6 +8,7 @@ class Plan extends Model
 {
     protected $fillable = [
         'name',
+        'service_id',
         'price',
         'request_limit',
         'duration_days'
@@ -19,5 +20,8 @@ class Plan extends Model
     }
     public function subscriptions(){
         return $this->hasMany(Subscription::class);
+    }
+    public function service(){
+        return $this->belongsTo(Service::class);
     }
 }
