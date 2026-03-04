@@ -1,0 +1,86 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\Subscription;
+use App\Models\SubscriptionRequest;
+use Illuminate\Http\Request;
+use Carbon\Carbon;
+
+
+class subscriptionsController extends Controller
+{
+    public function submitSubscriptionRequest(Request $request){
+        $request->validate([
+            'user_id'=>'required|integer',
+            'plan_id'=>'required|integer'
+        ]);
+        $newRequest=SubscriptionRequest::create([
+            'user_id'=>$request->user_id,
+            'plan_id'=>$request->plan_id,
+        ]);
+        return response()->json([
+            'message'=>"Subscription request sent",
+            'subscriptionReq'=>$newRequest
+        ],201);
+    }
+
+    public function showPendingRequests(){
+        $requests=SubscriptionRequest::where('status','pending')->get();
+        return response()->json([
+            'message'=>"pending requests",
+            "requests"=>$requests
+        ]);
+    }
+
+    public function approveRequests(Request $request){
+        $req=SubscriptionRequest::where('id',$request->id)->with('plan')->first();
+        if(!$req){
+            return response()->json([
+                'message'=>'request not found'
+            ],404);
+        }
+        if($req->status == 'approved'){
+            return response()->json([
+                'message'=>'request already approved'
+            ],400);
+        }
+
+        $req->status='approved';
+        $req->save();
+
+        $startsAtDate=Carbon::now();
+        
+        $newSubscription=Subscription::create([
+            'user_id'=>$req->user_id,
+            'plan_id'=>$req->plan_id,
+            'starts_at'=>$startsAtDate,
+            'ends_at'=>$startsAtDate->copy()->addDays($req->plan->duration_days)
+        ]);
+
+        return response()->json([
+            'message'=>'request approved',
+            'subscription'=>$newSubscription
+        ],200);
+    }
+
+    public function rejectRequests(Request $request){
+        $req=SubscriptionRequest::where('id',$request->id)->first();
+        if(!$req){
+            return response()->json([
+                'message'=>'request not found'
+            ],404);
+        }
+        if($req->status == 'rejected'){
+            return response()->json([
+                'message'=>'request already rejected'
+            ],400);
+        }
+        $req->status='rejected';
+        $req->save();
+        return response()->json([
+            'message'=>'request rejected'
+        ],200);
+    }
+}

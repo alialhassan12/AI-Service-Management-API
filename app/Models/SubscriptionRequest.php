@@ -9,7 +9,7 @@ class SubscriptionRequest extends Model
     protected $fillable = [
         'user_id',
         'plan_id',
-        'status'
+        'st atus'
     ];
 
     //Relations
