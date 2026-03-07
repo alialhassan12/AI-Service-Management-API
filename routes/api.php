@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\aiRequestsController;
 use App\Http\Controllers\Api\authController;
 use App\Http\Controllers\Api\plansController;
 use App\Http\Controllers\Api\servicesController;
@@ -16,6 +17,7 @@ Route::post('/login', [authController::class, 'login'])->name('login');
 Route::middleware('auth:sanctum','CheckRole:client')->group(function(){
     Route::post('/submit-subscription-request',[subscriptionsController::class,'submitSubscriptionRequest'])
         ->name('submit-subscription-request');
+    Route::post('/ai-request',[aiRequestsController::class,'submitAiRequests'])->name('submit-ai-request');
 });
 
 //admin protected routes
