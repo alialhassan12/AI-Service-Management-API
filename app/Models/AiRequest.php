@@ -13,7 +13,8 @@ class AiRequest extends Model
         'title',
         'description',
         'status',
-        'admin_notes'
+        'admin_notes',
+        'result'
     ];
 
     //Relations
