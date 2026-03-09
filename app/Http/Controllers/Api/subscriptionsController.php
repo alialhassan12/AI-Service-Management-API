@@ -102,4 +102,5 @@ class subscriptionsController extends Controller
             'message'=>'request rejected'
         ],200);
     }
+    
 }
