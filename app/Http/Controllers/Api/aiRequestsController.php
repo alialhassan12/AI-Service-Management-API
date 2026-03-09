@@ -7,6 +7,7 @@ use App\Models\AiRequest;
 use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Psr\Http\Message\ResponseInterface;
 
 use function Symfony\Component\Clock\now;
 
@@ -53,5 +54,23 @@ class aiRequestsController extends Controller
             'message'=>'Ai request sent successfully',
             'aiRequest'=>$newAiRequest
         ]);
+    }
+
+    public function aiRequestHistory(Request $request){
+        $user=auth('sanctum')->user();
+        $aiRequestsHistory=AiRequest::where('user_id',$user->id)->get();
+        return response()->json([
+            'message'=>'Ai Requests history',
+            'aiRequestsHistory'=>$aiRequestsHistory
+        ],200);
+    }
+
+    public function getAllAiRequests(Request $request){
+        //get all pending and processing ai-requests
+        $requests=AiRequest::where('status',['pending','processing'])->get();
+        return response()->json([
+            'message'=>'Pending and Processing ai-requests',
+            'aiRequests'=>$requests
+        ],200);
     }
 }

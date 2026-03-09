@@ -25,6 +25,6 @@ class Subscription extends Model
         return $this->belongsTo(Plan::class);
     }
     public function aiRequests(){
-        $this->hasMany(AiRequest::class);
+        return $this->hasMany(AiRequest::class);
     }
 }
