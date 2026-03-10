@@ -73,4 +73,39 @@ class aiRequestsController extends Controller
             'aiRequests'=>$requests
         ],200);
     }
+
+    public function updateAiRequest(Request $request,$id){
+        $request->validate([
+            'status'=>'required',
+            'admin_notes',
+            'result',
+        ]);
+        $aiRequest=AiRequest::where('id',$id)->first();
+        if(!$aiRequest){
+            return response()->json([
+                'message'=>'Ai request not found'
+            ],404);
+        }
+        $aiRequest->status=$request->status;
+        $aiRequest->admin_notes=$request->admin_notes;
+        $aiRequest->result=$request->result;
+        $aiRequest->save();
+        return response()->json([
+            'message'=>'Ai request status updated successfully',
+            'aiRequest'=>$aiRequest
+        ],200);
+    }
+
+    public function getAiRequest(Request $request,$id){
+        $aiRequest=AiRequest::where('id',$id)->first();
+        if(!$aiRequest){
+            return response()->json([
+                'message'=>'Ai request not found'
+            ],404);
+        }
+        return response()->json([
+            'message'=>'Ai request found',
+            'aiRequest'=>$aiRequest
+        ],200);
+    }
 }

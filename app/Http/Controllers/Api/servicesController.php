@@ -32,12 +32,12 @@ class servicesController extends Controller
         ],200);
     }
     
-    public function updateService(Request $request){
+    public function updateService(Request $request,$id){
         $request->validate([
             'name'=>'required',
             'description'=>'required'
         ]);
-        $service=Service::where('id',$request->id)->first();
+        $service=Service::where('id',$id)->first();
         if(!$service){
             return response()->json([
                 'message'=>'Service not Found'
@@ -53,8 +53,8 @@ class servicesController extends Controller
         ],200);
     }
 
-    public function deleteService(Request $request){
-        $service=Service::where('id',$request->id)->first();
+    public function deleteService(Request $request,$id){
+        $service=Service::where('id',$id)->first();
         if(!$service){
             return response()->json([
                 'message'=>'Service not Found'

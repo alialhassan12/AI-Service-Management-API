@@ -23,6 +23,8 @@ Route::middleware('auth:sanctum','CheckRole:client')->group(function(){
         ->name('submit-ai-request');
     Route::get('/ai-request/my-ai-requests',[aiRequestsController::class,'aiRequestHistory'])
         ->name('ai-request-history');
+    Route::get('/ai-request/{id}',[aiRequestsController::class,'getAiRequest'])
+        ->name('get specific ai-request');
 });
 
 //admin protected routes
@@ -47,12 +49,14 @@ Route::middleware('auth:sanctum','CheckRole:admin')->prefix('admin')->group(func
         ->name('deactivate-plan');
     Route::get('/get-pendnig-requests',[subscriptionsController::class,'showPendingRequests'])
         ->name('get-pending-requests');
-    Route::put('approve-subscription-requests/{id}',[subscriptionsController::class,'approveRequests'])
+    Route::put('/approve-subscription-requests/{id}',[subscriptionsController::class,'approveRequests'])
         ->name('approve-requests');
-    Route::put('reject-subscription-requests/{id}',[subscriptionsController::class,'rejectRequests'])
+    Route::put('/reject-subscription-requests/{id}',[subscriptionsController::class,'rejectRequests'])
         ->name('reject-requests');
     Route::get('/ai-requests',[aiRequestsController::class,'getAllAiRequests'])
         ->name('get-ai-requests');
+    Route::put('/ai-request/update-status/{id}',[aiRequestsController::class,'updateAiRequest'])
+        ->name('update-ai-request-status');
 });
 
 //common admin and client protected routes

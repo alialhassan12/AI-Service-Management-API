@@ -35,8 +35,8 @@ class subscriptionsController extends Controller
         ]);
     }
 
-    public function approveRequests(Request $request){
-        $req=SubscriptionRequest::where('id',$request->id)->with('plan')->first();
+    public function approveRequests(Request $request,$id){
+        $req=SubscriptionRequest::where('id',$id)->with('plan')->first();
         if(!$req){
             return response()->json([
                 'message'=>'request not found'
@@ -84,8 +84,8 @@ class subscriptionsController extends Controller
 
     }
 
-    public function rejectRequests(Request $request){
-        $req=SubscriptionRequest::where('id',$request->id)->first();
+    public function rejectRequests(Request $request,$id){
+        $req=SubscriptionRequest::where('id',$id)->first();
         if(!$req){
             return response()->json([
                 'message'=>'request not found'
