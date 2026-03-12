@@ -34,8 +34,8 @@ class aiRequestsController extends Controller
         }
         //check for ai requests limit
         $plan=$subscription->plan;
-        $aiRequestCount=AiRequest::where('subscription_id',$subscription->id)->count();
-        if($aiRequestCount>=$plan->request_limit){
+        // $aiRequestCount=AiRequest::where('subscription_id',$subscription->id)->count();
+        if($subscription->request_limit >=$plan->request_limit){
             return response()->json([
                 'message'=>'Request Limit Reached'
             ],403);
@@ -49,6 +49,9 @@ class aiRequestsController extends Controller
             'title'=>$request->title,
             'description'=>$request->description
         ]);
+
+        $subscription->request_limit+=1;
+        $subscription->save();
 
         return response()->json([
             'message'=>'Ai request sent successfully',

@@ -64,6 +64,7 @@ class subscriptionsController extends Controller
                 $subscription->starts_at=$startsAtDate;
                 $subscription->ends_at=$startsAtDate->copy()->addDays($req->plan->duration_days);
             }
+            $subscription->request_limit=0;
             $subscription->save();
         }else{
             $subscription=Subscription::create([
