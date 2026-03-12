@@ -53,8 +53,31 @@ class aiRequestsController extends Controller
         $subscription->request_limit+=1;
         $subscription->save();
 
+        try {
+            //Call Ollama API, which will use the cloud model if authenticated
+            $response = \Illuminate\Support\Facades\Http::post('http://127.0.0.1:11434/api/generate', [
+                // we use a cloud model from your screenshot by default
+                'model' => env('OLLAMA_MODEL', 'gpt-oss:120b-cloud'),
+                'prompt' => "Title: " . $request->title . "\nDescription: " . $request->description,
+                'stream' => false,
+            ]);
+
+            if ($response->successful()) {
+                $newAiRequest->result = $response->json('response');
+                $newAiRequest->status = 'completed';
+            } else {
+                $newAiRequest->status = 'failed';
+                $newAiRequest->admin_notes = 'Ollama API error: ' . $response->body();
+            }
+            $newAiRequest->save();
+        } catch (\Exception $e) {
+            $newAiRequest->status = 'failed';
+            $newAiRequest->admin_notes = 'Failed to connect to Ollama: ' . $e->getMessage();
+            $newAiRequest->save();
+        }
+
         return response()->json([
-            'message'=>'Ai request sent successfully',
+            'message'=>'Ai request result',
             'aiRequest'=>$newAiRequest
         ]);
     }
