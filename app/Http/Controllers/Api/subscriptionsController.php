@@ -3,10 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Mail\approvalMail;
+use App\Mail\rejectedMail;
+use App\Mail\submitSubscriptionRequest;
 use App\Models\Subscription;
 use App\Models\SubscriptionRequest;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
 
 use function Symfony\Component\Clock\now;
 
@@ -14,13 +19,14 @@ class subscriptionsController extends Controller
 {
     public function submitSubscriptionRequest(Request $request){
         $request->validate([
-            'user_id'=>'required|integer',
             'plan_id'=>'required|integer'
         ]);
+        $user=auth('sanctum')->user();
         $newRequest=SubscriptionRequest::create([
-            'user_id'=>$request->user_id,
+            'user_id'=>$user->id,
             'plan_id'=>$request->plan_id,
         ]);
+        Mail::to($user->email)->send(new submitSubscriptionRequest($newRequest));
         return response()->json([
             'message'=>"Subscription request sent",
             'subscriptionReq'=>$newRequest
@@ -36,7 +42,7 @@ class subscriptionsController extends Controller
     }
 
     public function approveRequests(Request $request,$id){
-        $req=SubscriptionRequest::where('id',$id)->with('plan')->first();
+        $req=SubscriptionRequest::where('id',$id)->with('plan','user')->first();
         if(!$req){
             return response()->json([
                 'message'=>'request not found'
@@ -78,6 +84,8 @@ class subscriptionsController extends Controller
         $req->status='approved';
         $req->save();
 
+        Mail::to($req->user->email)->send(new approvalMail($subscription));
+        
         return response()->json([
             'message'=>'request approved',
             'subscription'=>$subscription
@@ -86,7 +94,7 @@ class subscriptionsController extends Controller
     }
 
     public function rejectRequests(Request $request,$id){
-        $req=SubscriptionRequest::where('id',$id)->first();
+        $req=SubscriptionRequest::where('id',$id)->with('user')->first();
         if(!$req){
             return response()->json([
                 'message'=>'request not found'
@@ -99,6 +107,9 @@ class subscriptionsController extends Controller
         }
         $req->status='rejected';
         $req->save();
+
+        Mail::to($req->user->email)->send(new rejectedMail($req->user));
+
         return response()->json([
             'message'=>'request rejected'
         ],200);

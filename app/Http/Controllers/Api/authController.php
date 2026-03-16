@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Mail\welcomeMail;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class authController extends Controller
 {
@@ -25,6 +27,7 @@ class authController extends Controller
             'password'=>$hashedPassword
         ]);
         $token=$user->createToken('auth-token')->plainTextToken;
+        Mail::to($user->email)->send(new welcomeMail($user));
         return response()->json([
             'user'=>$user,
             'message'=>'registerd successfully',
