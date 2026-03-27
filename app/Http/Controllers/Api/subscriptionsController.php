@@ -54,31 +54,37 @@ class subscriptionsController extends Controller
             ],400);
         }
         
-        //get active subs
+        //get active subscription if available
         $subscription=Subscription::where('user_id',$req->user_id)
                                     ->where('status','active')
                                     ->where('ends_at','>',now())
                                     ->first();
         
         $startsAtDate=Carbon::now();
-
+        
+        //if user has active subscription
         if($subscription){
+            //if user wants to renew the same plan
             if($req->plan_id==$subscription->plan_id){
+                //extend the subscription
                 $subscription->ends_at=$subscription->ends_at->addDays($req->plan->duration_days);
             }else{
+                //update the subscription
                 $subscription->plan_id=$req->plan_id;
                 $subscription->starts_at=$startsAtDate;
                 $subscription->ends_at=$startsAtDate->copy()->addDays($req->plan->duration_days);
             }
+            // reset request limit
             $subscription->request_limit=0;
             $subscription->save();
         }else{
+            //if no active subscription create new subscription
             $subscription=Subscription::create([
-            'user_id'=>$req->user_id,
-            'plan_id'=>$req->plan_id,
-            'starts_at'=>$startsAtDate,
-            'ends_at'=>$startsAtDate->copy()->addDays($req->plan->duration_days)
-        ]);
+                'user_id'=>$req->user_id,
+                'plan_id'=>$req->plan_id,
+                'starts_at'=>$startsAtDate,
+                'ends_at'=>$startsAtDate->copy()->addDays($req->plan->duration_days)
+            ]);
         }
 
         $req->status='approved';
