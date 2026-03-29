@@ -54,23 +54,23 @@ class subscriptionsController extends Controller
             ],400);
         }
         
-        //get active subscription if available
-        $subscription=Subscription::where('user_id',$req->user_id)
-                                    ->where('status','active')
-                                    ->where('ends_at','>',now())
-                                    ->first();
+        //get user subscription if available
+        $subscription=Subscription::where('user_id',$req->user_id)->first();
         
         $startsAtDate=Carbon::now();
         
-        //if user has active subscription
+        //if user has subscription
         if($subscription){
-            //if user wants to renew the same plan
-            if($req->plan_id==$subscription->plan_id){
+            $isActive = $subscription->status == 'active' && Carbon::parse($subscription->ends_at)->isFuture();
+            
+            $subscription->plan_id=$req->plan_id;
+            
+            if($isActive){
                 //extend the subscription
-                $subscription->ends_at=$subscription->ends_at->addDays($req->plan->duration_days);
+                $subscription->ends_at=Carbon::parse($subscription->ends_at)->addDays($req->plan->duration_days);
             }else{
                 //update the subscription
-                $subscription->plan_id=$req->plan_id;
+                $subscription->status='active';
                 $subscription->starts_at=$startsAtDate;
                 $subscription->ends_at=$startsAtDate->copy()->addDays($req->plan->duration_days);
             }
@@ -78,7 +78,7 @@ class subscriptionsController extends Controller
             $subscription->request_limit=0;
             $subscription->save();
         }else{
-            //if no active subscription create new subscription
+            //if no subscription create new subscription
             $subscription=Subscription::create([
                 'user_id'=>$req->user_id,
                 'plan_id'=>$req->plan_id,
