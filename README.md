@@ -21,7 +21,7 @@ A robust, centralized platform built with Laravel for managing AI service subscr
 
 ---
 
-## 📖 API Documentation
+## API Documentation
 
 **Base URL**: `http://your-domain.com/api`
 
@@ -85,6 +85,82 @@ Clients receive automated emails for:
 - Approval/Rejection status updates.
 
 ---
+
+- **Background Tasks**: Laravel Scheduler (for expiration)
+- **AI Integration**: Ollama API
+
+## Getting Started
+
+### Prerequisites
+
+- PHP 8.2+
+- Composer
+- A running Ollama instance (optional for local AI processing)
+
+### Setup Instructions
+
+1.  **Clone the repository**:
+    ```bash
+    git clone https://github.com/your-repo/ai-service-management-api.git
+    cd ai-service-management-api
+    ```
+
+2.  **Install dependencies**:
+    ```bash
+    composer install
+    ```
+
+3.  **Environment Configuration**:
+    Copy the example environment file and set your database credentials and Ollama model:
+    ```bash
+    cp .env.example .env
+    php artisan key:generate
+    ```
+    *Note: Set `OLLAMA_MODEL` in your `.env` to your preferred model (e.g., `llama3`).*
+
+4.  **Database Setup**:
+    Run the migrations and seed the initial data:
+    ```bash
+    php artisan migrate
+    php artisan db:seed
+    ```
+    
+6.  **Start the Scheduler**:
+    To handle subscription expirations automatically, start the local worker:
+    ```bash
+    php artisan schedule:work
+    ```
+
+7.  **Run the Server**:
+    ```bash
+    php artisan serve
+    ```
+
+## 🧪 Testing
+
+The project includes a comprehensive suite of feature tests. Run them using:
+```bash
+php artisan test
+```
+
+## API Core Endpoints
+
+### Authentication
+- `POST /api/register` - Public registration
+- `POST /api/login` - Get auth token
+
+### Client Workflow
+- `GET /api/getServices` - Browse available services
+- `POST /api/submitSubscriptionRequest` - Request access to a plan
+- `POST /api/submitAiRequests` - Submit an AI task (Subscription required)
+- `GET /api/aiRequestHistory` - View personal AI request history
+
+### Admin Management
+- `POST /api/createService` - Define new AI offerings
+- `POST /api/createPlan` - Add pricing plans
+- `GET /api/get-pending-requests` - Review subscription requests
+- `PUT /api/approve-subscription-requests/{id}` - Approve users
+- `PUT /api/updateAiRequest/{id}` - Handle AI results manually (if needed)
 
 ## Entity Relationship Diagram
 <img width="1331" height="1272" alt="Ai-Service-Management-System (1)" src="https://github.com/user-attachments/assets/45b58d25-7141-4e4a-95a4-8aebe2c1a12d" />
