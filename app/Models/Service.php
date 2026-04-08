@@ -18,4 +18,10 @@ class Service extends Model
     public function plans(){
         return $this->hasMany(Plan::class);
     }
+    public function subscriptions(){
+        return $this->hasManyThrough(Subscription::class,Plan::class);
+    }
+    public function subscriptionRequests(){
+        return $this->hasManyThrough(SubscriptionRequest::class,Plan::class);
+    }
 }

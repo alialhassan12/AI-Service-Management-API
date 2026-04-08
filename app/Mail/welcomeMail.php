@@ -21,18 +21,13 @@ class welcomeMail extends Mailable
     {
         //
     }
-    public function build(){
-        return $this->subject('Welcome to our AI Service Management API')
-        ->view('emails.mailWelcome');
-    }
-
     /**
      * Get the message envelope.
      */
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Welcome Mail',
+            subject: 'Welcome to our AI Service Management API',
         );
     }
 

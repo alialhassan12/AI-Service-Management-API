@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Mail\approvalMail;
 use App\Mail\rejectedMail;
 use App\Mail\submitSubscriptionRequest;
+use App\Models\Plan;
 use App\Models\Subscription;
 use App\Models\SubscriptionRequest;
 use App\Models\User;
@@ -19,14 +20,34 @@ class subscriptionsController extends Controller
 {
     public function submitSubscriptionRequest(Request $request){
         $request->validate([
-            'plan_id'=>'required|integer'
+            'plan_id'=>'required|integer|exists:plans,id'
         ]);
+        
+        // check if plan is active
+        $plan=Plan::where('id',$request->plan_id)->first();
+        if(!$plan->is_active){
+            return response()->json([
+                'message'=>'plan is not active'
+            ],400);
+        }
+
         $user=auth('sanctum')->user();
+        
+        // check for duplicate request
+        $duplicateRequest=SubscriptionRequest::where('user_id',$user->id)->where('plan_id',$request->plan_id)->where('status','pending')->first();
+        if($duplicateRequest){
+            return response()->json([
+                'message'=>'you have already sent a request for this plan'
+            ],400);
+        }
+        
         $newRequest=SubscriptionRequest::create([
             'user_id'=>$user->id,
             'plan_id'=>$request->plan_id,
         ]);
+
         Mail::to($user->email)->send(new submitSubscriptionRequest($newRequest));
+        
         return response()->json([
             'message'=>"Subscription request sent",
             'subscriptionReq'=>$newRequest
@@ -75,7 +96,7 @@ class subscriptionsController extends Controller
                 $subscription->ends_at=$startsAtDate->copy()->addDays($req->plan->duration_days);
             }
             // reset request limit
-            $subscription->request_limit=0;
+            $subscription->request_count=0;
             $subscription->save();
         }else{
             //if no subscription create new subscription

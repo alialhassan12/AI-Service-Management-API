@@ -8,5 +8,5 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-//this runs daily to check the expired subscriptions
-Schedule::command('subscriptions:expire')->daily();
+//this runs hourly to check the expired subscriptions
+Schedule::command('subscriptions:expire')->hourly();

@@ -22,24 +22,13 @@ class approvalMail extends Mailable
     {
         //
     }
-    public function build(){
-        $user=User::where('id',$this->subscription->user_id)->first();
-        $plan=Plan::where('id',$this->subscription->plan_id)->with('service')->first();
-        return $this->subject('Subscription Request Approved')
-            ->view('emails.approvalMail',[
-                'subscription'=>$this->subscription,
-                'user'=>$user,
-                'plan'=>$plan
-            ]);
-    }
-
     /**
      * Get the message envelope.
      */
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Approval Mail',
+            subject: 'Subscription Request Approved',
         );
     }
 
@@ -50,6 +39,10 @@ class approvalMail extends Mailable
     {
         return new Content(
             view: 'emails.approvalMail',
+            with: [
+                'user' => User::where('id', $this->subscription->user_id)->first(),
+                'plan' => Plan::where('id', $this->subscription->plan_id)->with('service')->first(),
+            ],
         );
     }
 

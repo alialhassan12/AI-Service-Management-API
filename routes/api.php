@@ -47,7 +47,7 @@ Route::middleware('auth:sanctum','CheckRole:admin')->prefix('admin')->group(func
         ->name('activate-plan');
     Route::put('/deactivatePlan/{id}',[plansController::class,'deactivatePLan'])
         ->name('deactivate-plan');
-    Route::get('/get-pendnig-requests',[subscriptionsController::class,'showPendingRequests'])
+    Route::get('/get-pending-requests',[subscriptionsController::class,'showPendingRequests'])
         ->name('get-pending-requests');
     Route::put('/approve-subscription-requests/{id}',[subscriptionsController::class,'approveRequests'])
         ->name('approve-requests');

@@ -11,7 +11,7 @@ class plansController extends Controller
     public function createPlan(Request $request)
     {
         $request->validate([
-            'service_id'=>"required",
+            'service_id'=>"required|exists:services,id",
             "name" => "required",
             "price" => "required|numeric|min:0|decimal:0,2",
             "request_limit" => "required|numeric",
@@ -63,7 +63,7 @@ class plansController extends Controller
         return response()->json([
             'message'=>'plan updated successfully',
             'plan'=>$plan
-        ],201);
+        ],200);
     }
 
     public function deletePlan(Request $request,$id){
@@ -86,7 +86,7 @@ class plansController extends Controller
                 'message'=>'plan not found'
             ],404);
         }
-        $plan->isActive=true;
+        $plan->is_active=true;
         $plan->save();
 
         return response()->json([
@@ -100,7 +100,7 @@ class plansController extends Controller
                 'message'=>'plan not found'
             ],404);
         }
-        $plan->isActive=false;
+        $plan->is_active=false;
         $plan->save();
 
         return response()->json([

@@ -11,7 +11,8 @@ class Plan extends Model
         'service_id',
         'price',
         'request_limit',
-        'duration_days'
+        'duration_days',
+        'is_active'
     ];
 
     //Relations

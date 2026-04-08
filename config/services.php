@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'ollama' => [
+        'model' => env('OLLAMA_MODEL', 'gpt-oss:120b-cloud'),
+    ],
+
 ];

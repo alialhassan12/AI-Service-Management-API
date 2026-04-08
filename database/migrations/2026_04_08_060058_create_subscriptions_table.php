@@ -18,6 +18,7 @@ return new class extends Migration
             $table->timestamp('starts_at');
             $table->timestamp('ends_at');
             $table->enum('status',['active','expired','cancelled'])->default('active');
+            $table->integer('request_count')->default(0);
             $table->timestamps();
         });
     }

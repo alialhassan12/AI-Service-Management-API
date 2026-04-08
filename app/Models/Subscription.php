@@ -11,7 +11,8 @@ class Subscription extends Model
         'plan_id',
         'starts_at',
         'ends_at',
-        'status'
+        'status',
+        'request_count'
     ];
     protected $casts=[
         'starts_at'=>'datetime',

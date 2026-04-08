@@ -20,19 +20,13 @@ class rejectedMail extends Mailable
     {
         //
     }
-    public function build(){
-        return $this->subject('Subscription Request Update')
-                    ->view('emails.rejectedMail', [
-                        'user' => $this->user
-                    ]);
-    }
     /**
      * Get the message envelope.
      */
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Rejected Mail',
+            subject: 'Subscription Request Update',
         );
     }
 

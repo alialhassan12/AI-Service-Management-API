@@ -18,6 +18,7 @@ return new class extends Migration
             $table->double('price');
             $table->integer('request_limit');
             $table->integer('duration_days');
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

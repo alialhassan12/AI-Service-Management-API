@@ -35,7 +35,7 @@ class aiRequestsController extends Controller
         //check for ai requests limit
         $plan=$subscription->plan;
         // $aiRequestCount=AiRequest::where('subscription_id',$subscription->id)->count();
-        if($subscription->request_limit >=$plan->request_limit){
+        if($subscription->request_count >=$plan->request_limit){
             return response()->json([
                 'message'=>'Request Limit Reached'
             ],403);
@@ -53,8 +53,8 @@ class aiRequestsController extends Controller
         try {
             //Call Ollama API, which will use the cloud model if authenticated
             $response = \Illuminate\Support\Facades\Http::post('http://127.0.0.1:11434/api/generate', [
-                //use a cloud model
-                'model' => env('OLLAMA_MODEL', 'gpt-oss:120b-cloud'),
+                //use a config model
+                'model' => config('services.ollama.model'),
                 'prompt' => "Title: " . $request->title . "\nDescription: " . $request->description,
                 'stream' => false,
             ]);
@@ -63,7 +63,7 @@ class aiRequestsController extends Controller
                 $newAiRequest->result = $response->json('response');
                 $newAiRequest->status = 'completed';
                 // increase request limit
-                $subscription->request_limit+=1;
+                $subscription->request_count+=1;
                 $subscription->save();
             } else {
                 $newAiRequest->status = 'failed';
@@ -93,7 +93,7 @@ class aiRequestsController extends Controller
 
     public function getAllAiRequests(Request $request){
         //get all pending and processing ai-requests
-        $requests=AiRequest::where('status',['pending','processing'])->get();
+        $requests=AiRequest::whereIn('status',['pending','processing'])->get();
         return response()->json([
             'message'=>'Pending and Processing ai-requests',
             'aiRequests'=>$requests
@@ -102,9 +102,9 @@ class aiRequestsController extends Controller
 
     public function updateAiRequest(Request $request,$id){
         $request->validate([
-            'status'=>'required',
-            'admin_notes',
-            'result',
+            'status'=>'required|in:pending,reviewing,processing,completed,rejected',
+            'admin_notes'=>'nullable|string',
+            'result'=>'nullable',
         ]);
         $aiRequest=AiRequest::where('id',$id)->first();
         if(!$aiRequest){
@@ -125,6 +125,13 @@ class aiRequestsController extends Controller
 
     public function getAiRequest(Request $request,$id){
         $aiRequest=AiRequest::where('id',$id)->first();
+        // check ownership
+        $user=auth('sanctum')->user();
+        if($aiRequest->user_id!=$user->id){
+            return response()->json([
+                'message'=>'You are not authorized to view this Ai request'
+            ],403);
+        }
         if(!$aiRequest){
             return response()->json([
                 'message'=>'Ai request not found'

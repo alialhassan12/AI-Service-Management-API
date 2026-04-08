@@ -30,14 +30,14 @@ class authController extends Controller
         Mail::to($user->email)->send(new welcomeMail($user));
         return response()->json([
             'user'=>$user,
-            'message'=>'registerd successfully',
+            'message'=>'registered successfully',
             'token'=>$token
         ],201);
     }
     public function login(Request $request){
         $request->validate([
             'email'=>'required|email',
-            'password'=>'required|min:6'
+            'password'=>'required|min:8'
         ]);
         $user=User::where('email',$request->email)->first();
         if(!$user || !Hash::check($request->password,$user->password)){

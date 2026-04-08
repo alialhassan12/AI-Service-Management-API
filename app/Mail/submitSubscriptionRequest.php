@@ -22,17 +22,6 @@ class submitSubscriptionRequest extends Mailable
     {
         //
     }
-    public function build(){
-        $user=User::where('id',$this->subscriptionRequest->user_id)->first();
-        $plan=Plan::where('id',$this->subscriptionRequest->plan_id)->with('service')->first();
-        
-        return $this->subject('Submit Subscription Request')
-            ->view('emails.submitSubscriptionRequest',[
-                'user'=>$user,
-                'plan'=>$plan
-            ]);
-    }
-
     /**
      * Get the message envelope.
      */
@@ -50,6 +39,10 @@ class submitSubscriptionRequest extends Mailable
     {
         return new Content(
             view: 'emails.submitSubscriptionRequest',
+            with: [
+                'user' => User::where('id', $this->subscriptionRequest->user_id)->first(),
+                'plan' => Plan::where('id', $this->subscriptionRequest->plan_id)->with('service')->first(),
+            ],
         );
     }
 
